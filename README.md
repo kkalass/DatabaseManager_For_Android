@@ -75,7 +75,7 @@ The last step of course is calling your activity. You are free to integrate this
         public void onClick(View v) {	
             Intent dbmanager = new Intent(getActivity(), ExampleDatabaseManagerActivity.class);
             startActivity(dbmanager);
-	}
+        }
     });
 ```
 			
@@ -87,7 +87,7 @@ The last step of course is calling your activity. You are free to integrate this
         public void onClick(View v) {
             Intent dbmanager = new Intent(getActivity(), ExampleDatabaseManagerActivity.class.class);
             startActivity(dbmanager);
-	}
+        }
     });
 ```
 	
