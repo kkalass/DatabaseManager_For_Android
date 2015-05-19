@@ -22,12 +22,12 @@ $ git submodule add  https://github.com/kkalass/DatabaseManager_For_Android libr
 ```
 
 Next, add it to your _settings.gradle_
-```
+```Gradle
 include ':libraries:DatabaseManager_For_Android'
 ```
 
 Then, add it to your _build.gradle_
-```
+```Gradle
 dependencies {
     compile project(':libraries:DatabaseManager_For_Android')
 }
@@ -47,7 +47,7 @@ import de.kalass.android.databasemanager.AndroidDatabaseManager;
 public class ExampleDatabaseManagerActivity extends AndroidDatabaseManager {
     @Override
     protected SQLiteOpenHelper newSQLiteOpenHelper() {
-        // FIXME: change this to the SQLiteOpenHelper used in your app
+        // FIXME: change this to the SQLiteOpenHelper used in your app. Depending on your setup, you may need to use the singleton instance you use elsewhere.
         return new YourOpenHelper(this);
     }
 }
@@ -55,7 +55,7 @@ public class ExampleDatabaseManagerActivity extends AndroidDatabaseManager {
 ```
 
 After creating your own Activity class, you need to register it in your _AndroidManifest.xml_:
-```
+```xml
 <activity android:name="com.example.ExampleDatabaseManagerActivity" 
           android:theme="@style/Theme.AppCompat.Light"/>
 ```
