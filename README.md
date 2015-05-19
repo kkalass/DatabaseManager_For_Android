@@ -47,7 +47,8 @@ import de.kalass.android.databasemanager.AndroidDatabaseManager;
 public class ExampleDatabaseManagerActivity extends AndroidDatabaseManager {
     @Override
     protected SQLiteOpenHelper newSQLiteOpenHelper() {
-        // FIXME: change this to the SQLiteOpenHelper used in your app. Depending on your setup, you may need to use the singleton instance you use elsewhere.
+        // FIXME: change this to the SQLiteOpenHelper used in your app. 
+        // Depending on your setup, you may need to use the singleton instance you use elsewhere.
         return new YourOpenHelper(this);
     }
 }
