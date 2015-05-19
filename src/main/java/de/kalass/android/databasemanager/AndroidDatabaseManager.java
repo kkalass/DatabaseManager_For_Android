@@ -1,12 +1,21 @@
-//add your package name here example: package com.example.dbm;
+/*
+ * Based on https://github.com/sanathp/DatabaseManager_For_Android
+ */
+package de.kalass.android.databasemanager;
 
 //all required import files
+
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,10 +39,10 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class AndroidDatabaseManager extends Activity implements OnItemClickListener {
+public abstract class AndroidDatabaseManager extends Activity implements OnItemClickListener {
 
 //a static class to save cursor,table values etc which is used by functions to share data in the program.
-	static class indexInfo
+    private static class indexInfo
     {
     	public static int index = 10;
     	public static int numberofpages = 0;
@@ -52,26 +61,32 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 	
 	//in the below line Change the text 'yourCustomSqlHelper' with your custom sqlitehelper class name.
 	//Do not change the variable name dbm
-	yourCustomSqlLiteHelperclass dbm;
-	TableLayout tableLayout;
-	TableRow.LayoutParams tableRowParams;
-	HorizontalScrollView hsv;
-	ScrollView mainscrollview;
-	LinearLayout mainLayout;
-	TextView tvmessage;
-	Button previous;
-	Button next;
-	Spinner select_table;
-	TextView tv;
-	
-	indexInfo info = new indexInfo();
+    private SQLiteOpenHelper dbm;
+    private TableLayout tableLayout;
+    private TableRow.LayoutParams tableRowParams;
+    private HorizontalScrollView hsv;
+    private ScrollView mainscrollview;
+    private LinearLayout mainLayout;
+    private TextView tvmessage;
+    private Button previous;
+    private Button next;
+    private Spinner select_table;
+    private TextView tv;
+
+    private indexInfo info = new indexInfo();
+
+    /**
+     * @return your instance of SQLiteOpenHelper
+     */
+    protected abstract SQLiteOpenHelper newSQLiteOpenHelper();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 
 		//in the below line Change the text 'yourCustomSqlHelper' with your custom sqlitehelper class name
-		dbm = new yourCustomSqlLiteHelperclass(AndroidDatabaseManager.this);
+		dbm = newSQLiteOpenHelper();
 		
 		mainscrollview = new ScrollView(AndroidDatabaseManager.this);
 		
@@ -214,7 +229,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 				String Query10=customquerytext.getText().toString();
 				Log.d("query",Query10);
 				//pass the query to getdata method and get results
-				alc2 = dbm.getData(Query10);
+				alc2 = getData(dbm, Query10);
 				final Cursor c4=alc2.get(0);
 				Cursor Message2 =alc2.get(1);
 				Message2.moveToLast();
@@ -251,7 +266,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
        tableRowParams.setMargins(0, 0, 2, 0);
 
        // a query which returns a cursor with the list of tables in the database.We use this cursor to populate spinner in the first row
-		alc = dbm.getData(Query);
+		alc = getData(dbm, Query);
 		
 		//the first cursor has reults of the query
 		final Cursor c=alc.get(0);
@@ -384,7 +399,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 	            	Log.d("",""+Query2);
 
 	            	//getting contents of the table which user selected from the select_table spinner
-	            	ArrayList<Cursor> alc2=dbm.getData(Query2);
+	            	ArrayList<Cursor> alc2=getData(dbm, Query2);
 	            	final Cursor c2=alc2.get(0);
 	            	//saving cursor to the static indexinfo class which can be resued by the other functions
 	            	indexInfo.maincursor=c2;
@@ -424,7 +439,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 		                  								public void onClick(DialogInterface dialog, int which) {
 
 									                    		String Query6 = "Drop table "+indexInfo.table_name;
-									                    		ArrayList<Cursor> aldropt=dbm.getData(Query6);
+									                    		ArrayList<Cursor> aldropt=getData(dbm, Query6);
 																	Cursor tempc=aldropt.get(1);
 																	tempc.moveToLast();
 																	Log.d("Drop table Mesage",tempc.getString(0));
@@ -472,7 +487,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 		                  								public void onClick(DialogInterface dialog, int which) {
 									                    		String Query7 = "Delete  from "+indexInfo.table_name;
 									                    		Log.d("delete table query",Query7);
-									                    		ArrayList<Cursor> aldeletet=dbm.getData(Query7);
+									                    		ArrayList<Cursor> aldeletet=getData(dbm, Query7);
 																	Cursor tempc=aldeletet.get(1);
 																	tempc.moveToLast();
 																	Log.d("Delete table Mesage",tempc.getString(0));
@@ -635,7 +650,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 	                  									}
 	                  									//this is the insert query which has been generated
 	                  									Log.d("Insert Query",Query4);
-	                  									ArrayList<Cursor> altc=dbm.getData(Query4);
+	                  									ArrayList<Cursor> altc=getData(dbm, Query4);
 	                  									Cursor tempc=altc.get(1);
 	                  									tempc.moveToLast();
 	                  									Log.d("Add New Row",tempc.getString(0));
@@ -734,9 +749,9 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 	}
 	
 	//get columnnames of the empty tables and save them in a array list
-	public void getcolumnnames()
+	private void getcolumnnames()
 	{
-		ArrayList<Cursor> alc3=dbm.getData("PRAGMA table_info("+indexInfo.table_name+")");
+		ArrayList<Cursor> alc3=getData(dbm, "PRAGMA table_info("+indexInfo.table_name+")");
     	Cursor c5=alc3.get(0);
     	indexInfo.isEmpty=true;
     	if(c5!=null)
@@ -756,7 +771,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 		
 	}
 	//displays alert dialog from which use can update or delete a row 
-	public void updateDeletePopup(int row)
+	private void updateDeletePopup(int row)
 	{
 		Cursor c2=indexInfo.maincursor;
 	// a spinner which gives options to update or delete the row which user has selected
@@ -947,8 +962,8 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 									}
 								}
 								Log.d("Update Query",Query3);
-								//dbm.getData(Query3);
-								ArrayList<Cursor> aluc=dbm.getData(Query3);
+								//getData(dbm, Query3);
+								ArrayList<Cursor> aluc=getData(dbm, Query3);
 								Cursor tempc=aluc.get(1);
 								tempc.moveToLast();
 								Log.d("Update Mesage",tempc.getString(0));
@@ -997,9 +1012,9 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 									}
 									Log.d("Delete Query",Query5);
 
-									dbm.getData(Query5);
+									getData(dbm, Query5);
 
-									ArrayList<Cursor> aldc=dbm.getData(Query5);
+									ArrayList<Cursor> aldc=getData(dbm, Query5);
 									Cursor tempc=aldc.get(1);
 									tempc.moveToLast();
 									Log.d("Update Mesage",tempc.getString(0));
@@ -1031,21 +1046,21 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 		});
 	}
 	
-	public void refreshactivity()
+	private void refreshactivity()
 	{
 		
 		finish();
 		startActivity(getIntent());
 	}
 	
-	public void refreshTable(int d )
+	private void refreshTable(int d )
 	{	
 		Cursor c3=null;
 		tableLayout.removeAllViews();
 		if(d==0)
 		{
 		String Query8 = "select * from "+indexInfo.table_name;
-		ArrayList<Cursor> alc3=dbm.getData(Query8);
+		ArrayList<Cursor> alc3=getData(dbm, Query8);
     	c3=alc3.get(0);
     	//saving cursor to the static indexinfo class which can be resued by the other functions
     	indexInfo.maincursor=c3;
@@ -1114,7 +1129,7 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 	}
 	
 	//the function which displays tuples from database in a table layout
-	public void paginatetable(final int number)
+	private void paginatetable(final int number)
 		{
 
 		 
@@ -1282,4 +1297,53 @@ public class AndroidDatabaseManager extends Activity implements OnItemClickListe
 
 	}
 
+    private ArrayList<Cursor> getData(SQLiteOpenHelper helper, String Query){
+        //get writable database
+        SQLiteDatabase sqlDB = helper.getWritableDatabase();
+        String[] columns = new String[] { "mesage" };
+        //an array list of cursor to save two cursors one has results from the query
+        //other cursor stores error message if any errors are triggered
+        ArrayList<Cursor> alc = new ArrayList<Cursor>(2);
+        MatrixCursor Cursor2= new MatrixCursor(columns);
+        alc.add(null);
+        alc.add(null);
+
+
+        try{
+            String maxQuery = Query ;
+            //execute the query results will be save in Cursor c
+            Cursor c = sqlDB.rawQuery(maxQuery, null);
+
+
+            //add value to cursor2
+            Cursor2.addRow(new Object[] { "Success" });
+
+            alc.set(1,Cursor2);
+            if (null != c && c.getCount() > 0) {
+
+
+                alc.set(0,c);
+                c.moveToFirst();
+
+                return alc ;
+            }
+            return alc;
+        } catch(SQLException sqlEx){
+            Log.d("printing exception", sqlEx.getMessage());
+            //if any exceptions are triggered save the error message to cursor an return the arraylist
+            Cursor2.addRow(new Object[] { ""+sqlEx.getMessage() });
+            alc.set(1,Cursor2);
+            return alc;
+        } catch(Exception ex){
+
+            Log.d("printing exception", ex.getMessage());
+
+            //if any exceptions are triggered save the error message to cursor an return the arraylist
+            Cursor2.addRow(new Object[] { ""+ex.getMessage() });
+            alc.set(1,Cursor2);
+            return alc;
+        }
+
+
+    }
 }
