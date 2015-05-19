@@ -81,7 +81,7 @@ The last step of course is calling your activity. You are free to integrate this
 			
 (ii) add OnClickListener to a Button. You can use the button which is already present in your layout or add a 			Button element to your xml.
 
-```    	
+```java	
     Button button =(Button)findViewByID(R.id.yourbuttonid);
     button.setOnClickListener(new OnClickListener() {
         public void onClick(View v) {
