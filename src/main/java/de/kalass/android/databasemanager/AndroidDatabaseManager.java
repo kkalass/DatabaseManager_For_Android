@@ -103,7 +103,7 @@ public abstract class AndroidDatabaseManager extends Activity implements OnItemC
                 //the first row of layout which has a text view and spinner
 		final LinearLayout firstrow = new LinearLayout(AndroidDatabaseManager.this);
 		firstrow.setPadding(0,10,0,20);
-		LinearLayout.LayoutParams firstrowlp = new LinearLayout.LayoutParams(0, 150);
+		LinearLayout.LayoutParams firstrowlp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
 		firstrowlp.weight = 1;
 
 		TextView maintext = new TextView(AndroidDatabaseManager.this);
