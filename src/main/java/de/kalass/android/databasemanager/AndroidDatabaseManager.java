@@ -9,6 +9,7 @@ package de.kalass.android.databasemanager;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -736,6 +737,7 @@ public abstract class AndroidDatabaseManager extends Activity implements OnItemC
 
     }
 
+    @SuppressLint("ResourceType")
     //displays alert dialog from which use can update or delete a row
     private void updateDeletePopup(int row) {
         Cursor c2 = indexInfo.maincursor;
