@@ -10,9 +10,10 @@ repositories {
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:3.0.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -20,7 +21,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '4.4.1'
 
     def jvmOpts = "-XX:MaxPermSize=512m -Xmx512m"
     inputs.property("jvmOpts", jvmOpts)
@@ -32,13 +33,13 @@ task wrapper(type: Wrapper) {
 }
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 27
 
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 22
+        minSdkVersion 14
+        targetSdkVersion 27
     }
 
     compileOptions {
